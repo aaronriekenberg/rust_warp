@@ -1,0 +1,12 @@
+[package]
+name = "rust_warp"
+version = "0.1.0"
+authors = ["Aaron Riekenberg <aaron.riekenberg@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+pretty_env_logger = "0.3"
+
+[dependencies.warp]
+version = "0.1"
+features = ["tls"]
