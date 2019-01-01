@@ -8,7 +8,7 @@ use serde_json::json;
 use std::error::Error;
 use std::sync::Arc;
 
-use warp::Filter;
+use warp::{Filter, Future};
 
 fn install_panic_hook() {
     let original_panic_hook = std::panic::take_hook();
@@ -50,16 +50,31 @@ fn main() {
     let handlebars = move |with_template| render(with_template, hb.clone());
 
     //GET /
-    let route = warp::get2()
+    let index_route = warp::get2()
         .and(warp::path::end())
         .map(|| WithTemplate {
             name: "index.html",
             value: json!({"user" : "Warp"}),
         })
-        .map(handlebars)
+        .map(handlebars);
+
+    let api_route = warp::path("api").and_then(|| {
+        futures::future::ok::<String, String>("hello api".to_string()).map_err(|err| {
+            eprintln!("future error {}", err);
+            warp::reject::custom(err)
+        })
+    });
+
+    let favicon_route = warp::get2()
+        .and(warp::path("favicon.ico"))
+        .and(warp::fs::file("./static/rust-favicon.ico"));
+
+    let routes = index_route
+        .or(api_route)
+        .or(favicon_route)
         .with(warp::log("main"));
 
-    warp::serve(route)
+    warp::serve(routes)
         .tls("localhost-cert.pem", "localhost-privkey.pem")
         .run(([127, 0, 0, 1], 3030));
 }
