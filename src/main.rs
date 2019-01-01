@@ -37,20 +37,10 @@ fn main() {
 
     logging::initialize_logging().expect("failed to initialize logging");
 
-    let template = "<!DOCTYPE html>
-                    <html>
-                      <head>
-                        <title>Warp Handlebars template example</title>
-                      </head>
-                      <body>
-                        <h1>Hello {{user}}!</h1>
-                      </body>
-                    </html>";
-
     let mut hb = Handlebars::new();
     // register the template
-    hb.register_template_string("template.html", template)
-        .unwrap();
+    hb.register_template_file("index.html", "./templates/index.hbs")
+        .expect("failed to register template file");
 
     // Turn Handlebars instance into a Filter so we can combine it
     // easily with others...
@@ -63,7 +53,7 @@ fn main() {
     let route = warp::get2()
         .and(warp::path::end())
         .map(|| WithTemplate {
-            name: "template.html",
+            name: "index.html",
             value: json!({"user" : "Warp"}),
         })
         .map(handlebars)
