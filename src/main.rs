@@ -1,7 +1,9 @@
+mod logging;
+
 use warp::Filter;
 
 fn main() {
-    pretty_env_logger::init();
+    logging::initialize_logging().expect("failed to initialize logging");
 
     // Match any request and return hello world!
     let routes = warp::any().map(|| "Hello, World!").with(warp::log("main"));
