@@ -8,7 +8,7 @@ use serde_json::json;
 use std::error::Error;
 use std::sync::Arc;
 
-use warp::{Filter, Future};
+use warp::{filters::BoxedFilter, Filter, Future, Reply};
 
 fn install_panic_hook() {
     let original_panic_hook = std::panic::take_hook();
@@ -32,46 +32,62 @@ where
         .unwrap_or_else(|err| err.description().to_owned())
 }
 
-fn main() {
-    install_panic_hook();
-
-    logging::initialize_logging().expect("failed to initialize logging");
-
-    let mut hb = Handlebars::new();
+fn create_handlebars() -> Arc<Handlebars> {
+    let mut mut_hb = Handlebars::new();
     // register the template
-    hb.register_template_file("index.html", "./templates/index.hbs")
+    mut_hb
+        .register_template_file("index.html", "./templates/index.hbs")
         .expect("failed to register template file");
 
-    // Turn Handlebars instance into a Filter so we can combine it
-    // easily with others...
-    let hb = Arc::new(hb);
+    Arc::new(mut_hb)
+}
 
+fn index_route(hb: Arc<Handlebars>) -> BoxedFilter<(impl Reply,)> {
     // Create a reusable closure to render template
-    let handlebars = move |with_template| render(with_template, hb.clone());
+    let handlebars_handler = move |with_template| render(with_template, Arc::clone(&hb));
 
     //GET /
-    let index_route = warp::get2()
+    warp::get2()
         .and(warp::path::end())
         .map(|| WithTemplate {
             name: "index.html",
             value: json!({"user" : "Warp"}),
         })
-        .map(handlebars);
+        .map(handlebars_handler)
+        .boxed()
+}
 
-    let api_route = warp::get2().and(warp::path("api")).and_then(|| {
-        futures::future::ok::<String, String>("hello api".to_string()).map_err(|err| {
-            eprintln!("future error {}", err);
-            warp::reject::custom(err)
+fn api_route() -> BoxedFilter<(impl Reply,)> {
+    warp::get2()
+        .and(warp::path("api"))
+        .and_then(|| {
+            futures::future::ok::<String, String>("hello api".to_string()).map_err(|err| {
+                eprintln!("future error {}", err);
+                warp::reject::custom(err)
+            })
         })
-    });
+        .boxed()
+}
 
-    let favicon_route = warp::get2()
+fn favicon_route() -> BoxedFilter<(impl Reply,)> {
+    warp::get2()
         .and(warp::path("favicon.ico"))
-        .and(warp::fs::file("./static/rust-favicon.ico"));
+        .and(warp::fs::file("./static/rust-favicon.ico"))
+        .boxed()
+}
 
-    let routes = index_route
-        .or(api_route)
-        .or(favicon_route)
+fn main() {
+    install_panic_hook();
+
+    logging::initialize_logging().expect("failed to initialize logging");
+
+    // Turn Handlebars instance into a Filter so we can combine it
+    // easily with others...
+    let hb = create_handlebars();
+
+    let routes = index_route(Arc::clone(&hb))
+        .or(api_route())
+        .or(favicon_route())
         .with(warp::log("main"));
 
     warp::serve(routes)
