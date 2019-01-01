@@ -1,5 +1,7 @@
 mod logging;
 
+use log::warn;
+
 use handlebars::Handlebars;
 
 use serde::Serialize;
@@ -8,7 +10,7 @@ use serde_json::json;
 use std::error::Error;
 use std::sync::Arc;
 
-use warp::{filters::BoxedFilter, Filter, Future, Reply};
+use warp::{filters::BoxedFilter, path, Filter, Future, Reply};
 
 fn install_panic_hook() {
     let original_panic_hook = std::panic::take_hook();
@@ -59,10 +61,10 @@ fn index_route(hb: Arc<Handlebars>) -> BoxedFilter<(impl Reply,)> {
 
 fn api_route() -> BoxedFilter<(impl Reply,)> {
     warp::get2()
-        .and(warp::path("api"))
-        .and_then(|| {
-            futures::future::ok::<String, String>("hello api".to_string()).map_err(|err| {
-                eprintln!("future error {}", err);
+        .and(path!("api" / String))
+        .and_then(|user| {
+            futures::future::ok::<String, String>(format!("hello {}", user)).map_err(|err| {
+                warn!("future error {}", err);
                 warp::reject::custom(err)
             })
         })
