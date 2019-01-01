@@ -58,7 +58,7 @@ fn main() {
         })
         .map(handlebars);
 
-    let api_route = warp::path("api").and_then(|| {
+    let api_route = warp::get2().and(warp::path("api")).and_then(|| {
         futures::future::ok::<String, String>("hello api".to_string()).map_err(|err| {
             eprintln!("future error {}", err);
             warp::reject::custom(err)
