@@ -1,3 +1,5 @@
+mod config;
+mod handlers;
 mod logging;
 
 use handlebars::Handlebars;
@@ -34,10 +36,13 @@ where
 
 fn create_handlebars() -> Arc<Handlebars> {
     let mut mut_hb = Handlebars::new();
-    // register the template
+
+    mut_hb
+        .register_template_file("command.html", "./templates/command.hbs")
+        .expect("failed to register command.html");
     mut_hb
         .register_template_file("index.html", "./templates/index.hbs")
-        .expect("failed to register template file");
+        .expect("failed to register index.html");
 
     Arc::new(mut_hb)
 }
@@ -62,9 +67,9 @@ fn api_route() -> BoxedFilter<(impl Reply,)> {
         .and(path!("api" / String))
         .and_then(|user| {
             if user == "aaron" {
-                futures::future::err(warp::reject::not_found())
+                Box::new(futures::future::err(warp::reject::not_found()))
             } else {
-                futures::future::ok(format!("hello {}", user))
+                Box::new(futures::future::ok(format!("hello {}", user)))
             }
         })
         .boxed()
@@ -82,16 +87,32 @@ fn main() {
 
     logging::initialize_logging().expect("failed to initialize logging");
 
+    let config_file = std::env::args()
+        .nth(1)
+        .expect("config file required as command line argument");
+
+    let config = config::read_config(config_file).expect("error reading configuration file");
+
     // Turn Handlebars instance into a Filter so we can combine it
     // easily with others...
     let hb = create_handlebars();
 
     let routes = index_route(Arc::clone(&hb))
+        .or(handlers::command::html_route(
+            Arc::clone(&hb),
+            config.commands(),
+        ))
         .or(api_route())
         .or(favicon_route())
         .with(warp::log("main"));
 
+    let listen_addr: std::net::SocketAddr = config
+        .server_info()
+        .listen_address()
+        .parse()
+        .expect("listen_addr parse error");
+
     warp::serve(routes)
         .tls("localhost-cert.pem", "localhost-privkey.pem")
-        .run(([127, 0, 0, 1], 3030));
+        .run(listen_addr);
 }
