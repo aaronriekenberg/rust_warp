@@ -98,7 +98,7 @@ impl ServerInfo {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MainPageInfo {
     title: String,
 }
@@ -115,7 +115,6 @@ pub struct Configuration {
     main_page_info: MainPageInfo,
     commands: Vec<CommandInfo>,
     proxies: Vec<ProxyInfo>,
-    static_paths: Vec<StaticPathInfo>,
 }
 
 impl Configuration {
@@ -133,10 +132,6 @@ impl Configuration {
 
     pub fn proxies(&self) -> &Vec<ProxyInfo> {
         &self.proxies
-    }
-
-    pub fn static_paths(&self) -> &Vec<StaticPathInfo> {
-        &self.static_paths
     }
 }
 

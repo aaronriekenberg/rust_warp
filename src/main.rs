@@ -22,61 +22,22 @@ fn install_panic_hook() {
     }));
 }
 
-struct WithTemplate<T: Serialize> {
-    name: &'static str,
-    value: T,
-}
-
-fn render<T>(template: WithTemplate<T>, hbs: Arc<Handlebars>) -> impl warp::Reply
-where
-    T: Serialize,
-{
-    hbs.render(template.name, &template.value)
-        .unwrap_or_else(|err| err.description().to_owned())
-}
-
 fn create_handlebars() -> Arc<Handlebars> {
     let mut mut_hb = Handlebars::new();
 
     mut_hb
-        .register_template_file("command.html", "./templates/command.hbs")
-        .expect("failed to register command.html");
-    mut_hb
         .register_template_file("index.html", "./templates/index.hbs")
         .expect("failed to register index.html");
+
+    mut_hb
+        .register_template_file("command.html", "./templates/command.hbs")
+        .expect("failed to register command.html");
 
     Arc::new(mut_hb)
 }
 
-fn index_route(hb: Arc<Handlebars>) -> BoxedFilter<(impl Reply,)> {
-    // Create a reusable closure to render template
-    let handlebars_handler = move |with_template| render(with_template, Arc::clone(&hb));
-
-    //GET /
-    warp::get2()
-        .and(warp::path::end())
-        .map(|| WithTemplate {
-            name: "index.html",
-            value: json!({"user" : "Warp"}),
-        })
-        .map(handlebars_handler)
-        .boxed()
-}
-
 fn static_file_routes() -> BoxedFilter<(impl Reply,)> {
-    let favicon = warp::get2()
-        .and(warp::path("favicon.ico"))
-        .and(warp::fs::file("./static/rust-favicon.ico"));
-
-    let command_js = warp::get2()
-        .and(warp::path("command.js"))
-        .and(warp::fs::file("./static/command.js"));
-
-    let style_css = warp::get2()
-        .and(warp::path("style.css"))
-        .and(warp::fs::file("./static/style.css"));
-
-    favicon.or(command_js).or(style_css).boxed()
+    warp::path("static").and(warp::fs::dir("./static")).boxed()
 }
 
 fn main() {
@@ -94,7 +55,7 @@ fn main() {
     // easily with others...
     let hb = create_handlebars();
 
-    let routes = index_route(Arc::clone(&hb))
+    let routes = handlers::index::create_routes(Arc::clone(&hb), config.main_page_info())
         .or(handlers::command::create_routes(
             Arc::clone(&hb),
             config.commands(),

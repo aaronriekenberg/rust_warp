@@ -4,8 +4,8 @@
 <head>
   <title>{{description}}</title>
   <meta name="viewport" content="width=device, initial-scale=1" />
-  <link rel="stylesheet" type="text/css" href="/style.css" />
-  <script src="/command.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/style.css" />
+  <script src="/static/command.js"></script>
 </head>
 
 <body onload="onload('{{command}}{{#each args}} {{.}}{{/each}}', '/api/commands/{{id}}')">
