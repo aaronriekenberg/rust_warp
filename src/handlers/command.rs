@@ -34,7 +34,7 @@ fn build_html_response(
     }
 }
 
-pub fn html_route(
+fn html_route(
     hb: Arc<Handlebars>,
     commands: &Vec<crate::config::CommandInfo>,
 ) -> BoxedFilter<(impl Reply,)> {
@@ -112,11 +112,18 @@ fn build_command_api_response(
     }
 }
 
-pub fn api_route(commands: &Vec<crate::config::CommandInfo>) -> BoxedFilter<(impl Reply,)> {
+fn api_route(commands: &Vec<crate::config::CommandInfo>) -> BoxedFilter<(impl Reply,)> {
     let command_map = build_command_map(commands);
 
     warp::get2()
         .and(path!("api" / "commands" / String))
         .and_then(move |command_id| build_command_api_response(command_map.get(&command_id)))
         .boxed()
+}
+
+pub fn create_routes(
+    hb: Arc<Handlebars>,
+    commands: &Vec<crate::config::CommandInfo>,
+) -> BoxedFilter<(impl Reply,)> {
+    html_route(hb, commands).or(api_route(commands)).boxed()
 }

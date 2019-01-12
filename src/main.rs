@@ -86,11 +86,10 @@ fn main() {
     let hb = create_handlebars();
 
     let routes = index_route(Arc::clone(&hb))
-        .or(handlers::command::html_route(
+        .or(handlers::command::create_routes(
             Arc::clone(&hb),
             config.commands(),
         ))
-        .or(handlers::command::api_route(config.commands()))
         .or(favicon_route())
         .with(warp::log("main"));
 
