@@ -11,6 +11,12 @@
       "description": "ifconfig",
       "command": "ifconfig",
       "args": ["-a"]
+    },
+    {
+      "id": "ls",
+      "description": "ls",
+      "command": "ls",
+      "args": []
     }
   ],
   "proxies": [
@@ -18,6 +24,11 @@
       "id": "google",
       "description": "google",
       "url": "http://www.gogle.com"
+    },
+    {
+      "id": "mpr",
+      "description": "mpr",
+      "url": "http://www.mpr.org"
     }
   ],
   "static_paths": [
