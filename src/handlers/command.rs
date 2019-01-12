@@ -1,11 +1,7 @@
-//use futures::Future;
-
 use handlebars::Handlebars;
 
 use serde_derive::Serialize;
-use serde_json::json;
 
-use std::borrow::Cow;
 use std::collections::HashMap;
 use std::error::Error;
 use std::process::Command;
@@ -13,7 +9,7 @@ use std::sync::Arc;
 
 use tokio_process::CommandExt;
 
-use warp::{filters::BoxedFilter, path, Filter, Future, Rejection, Reply};
+use warp::{filters::BoxedFilter, path, Filter, Future, Reply};
 
 type CommandMap = HashMap<String, crate::config::CommandInfo>;
 
@@ -57,17 +53,18 @@ fn run_command(
 
     command.args(command_info.args());
 
-    command
-        .output_async()
-        .and_then(move |output| {
-            let mut combined_output =
-                String::with_capacity(output.stderr.len() + output.stdout.len());
-            combined_output.push_str(&String::from_utf8_lossy(&output.stderr));
-            combined_output.push_str(&String::from_utf8_lossy(&output.stdout));
-            Ok(combined_output)
-        })
-        .or_else(move |err| Ok(format!("command error: {}", err)))
-        .boxed()
+    Box::new(
+        command
+            .output_async()
+            .and_then(move |output| {
+                let mut combined_output =
+                    String::with_capacity(output.stderr.len() + output.stdout.len());
+                combined_output.push_str(&String::from_utf8_lossy(&output.stderr));
+                combined_output.push_str(&String::from_utf8_lossy(&output.stdout));
+                Ok(combined_output)
+            })
+            .or_else(move |err| Ok(format!("command error: {}", err))),
+    )
 }
 
 fn build_command_line_string(command_info: &crate::config::CommandInfo) -> String {
@@ -90,25 +87,16 @@ struct APIResponse {
     output: String,
 }
 
-pub fn api_route(commands: &Vec<crate::config::CommandInfo>) -> BoxedFilter<(impl Reply,)> {
-    let command_map = build_command_map(commands);
+fn build_command_api_response(
+    command_info_option: Option<&crate::config::CommandInfo>,
+) -> Box<Future<Item = impl warp::Reply, Error = warp::Rejection> + Send> {
+    match command_info_option {
+        None => Box::new(futures::future::err(warp::reject::not_found())),
+        Some(command_info) => {
+            let command_info_clone = command_info.clone();
+            let command_line_string = build_command_line_string(command_info);
 
-    warp::get2()
-        .and(path!("api" / "commands" / String))
-        .and_then(move |command_id| match command_map.get(&command_id) {
-            None => futures::future::err(warp::reject::not_found()).boxed(),
-            // Some(command_info) => {
-            //     let api_response = APIResponse {
-            //             now: "now".to_string(),
-            //             command_line: "cl".to_string(),
-            //             output: "output".to_string()
-            //     };
-            //     Box::new(futures::future::ok(warp::reply::json(&api_response)))
-            // }
-            Some(command_info) => {
-                let command_info_clone = command_info.clone();
-                let command_line_string = build_command_line_string(&command_info_clone);
-
+            Box::new(
                 run_command(command_info_clone)
                     .and_then(move |command_output| {
                         let api_response = APIResponse {
@@ -118,9 +106,17 @@ pub fn api_route(commands: &Vec<crate::config::CommandInfo>) -> BoxedFilter<(imp
                         };
                         Ok(warp::reply::json(&api_response))
                     })
-                    .or_else(|err| Err(warp::reject::server_error()))
-                    .boxed()
-            }
-        })
+                    .or_else(|err| Err(warp::reject::custom(err))),
+            )
+        }
+    }
+}
+
+pub fn api_route(commands: &Vec<crate::config::CommandInfo>) -> BoxedFilter<(impl Reply,)> {
+    let command_map = build_command_map(commands);
+
+    warp::get2()
+        .and(path!("api" / "commands" / String))
+        .and_then(move |command_id| build_command_api_response(command_map.get(&command_id)))
         .boxed()
 }

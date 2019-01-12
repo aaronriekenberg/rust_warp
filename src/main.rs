@@ -11,7 +11,7 @@ use serde_json::json;
 use std::error::Error;
 use std::sync::Arc;
 
-use warp::{filters::BoxedFilter, path, Filter, Reply};
+use warp::{filters::BoxedFilter, Filter, Reply};
 
 fn install_panic_hook() {
     let original_panic_hook = std::panic::take_hook();
