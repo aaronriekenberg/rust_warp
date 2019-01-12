@@ -63,7 +63,6 @@ fn build_proxy_map(proxies: &Vec<crate::config::ProxyInfo>) -> ProxyMap {
 }
 #[derive(Default)]
 struct ResponseInfo {
-    uri: Uri,
     version: String,
     status: String,
     headers: String,
@@ -71,12 +70,9 @@ struct ResponseInfo {
 }
 
 fn fetch_proxy(
-    uri: Uri,
+    uri: &Uri,
     http_client: &HyperHttpClient,
 ) -> Box<Future<Item = ResponseInfo, Error = std::io::Error> + Send> {
-    let uri_clone1 = uri.clone();
-    let uri_clone2 = uri.clone();
-
     Box::new(
         http_client
             .get(uri.clone())
@@ -89,14 +85,12 @@ fn fetch_proxy(
                     .concat2()
                     .then(move |result| match result {
                         Ok(body) => Ok(ResponseInfo {
-                            uri: uri_clone1,
                             version,
                             status,
                             headers,
                             body: String::from_utf8_lossy(&body).into_owned(),
                         }),
                         Err(e) => Ok(ResponseInfo {
-                            uri: uri_clone1,
                             version,
                             status,
                             headers,
@@ -106,7 +100,6 @@ fn fetch_proxy(
             })
             .or_else(move |err| {
                 Ok(ResponseInfo {
-                    uri: uri_clone2,
                     body: format!("proxy error: {}", err),
                     ..Default::default()
                 })
@@ -135,12 +128,12 @@ fn build_proxy_api_response(
             let uri = proxy_info.url().parse().unwrap();
 
             Box::new(
-                fetch_proxy(uri, &http_client)
+                fetch_proxy(&uri, &http_client)
                     .and_then(move |response_info| {
                         let api_response = APIResponse {
                             now: crate::utils::local_time_now_to_string(),
                             method: "GET".to_string(),
-                            url: response_info.uri.to_string(),
+                            url: uri.to_string(),
                             version: response_info.version,
                             status: response_info.status,
                             headers: response_info.headers,
