@@ -19,6 +19,14 @@
     </h3>
   {{/if}}
 
+  {{#if proxies}}
+    <h3>Proxies:</h3>
+      <ul>{{#each proxies}}
+        <li><a href="/proxies/{{id}}">{{description}}</a></li>{{/each}}
+      </ul>
+    </h3>
+  {{/if}}
+
 </body>
 
 </html>

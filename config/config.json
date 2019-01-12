@@ -15,9 +15,8 @@
   ],
   "proxies": [
     {
-      "api_path": "/api/proxies/test_proxy",
-      "html_path": "/proxies/test_proxy",
-      "description": "test proxy",
+      "id": "google",
+      "description": "google",
       "url": "http://www.gogle.com"
     }
   ],

@@ -25,6 +25,7 @@ fn create_handlebars() -> Arc<Handlebars> {
     handlers::index::register_templates(&mut mut_hb).expect("error registering index templates");
     handlers::command::register_templates(&mut mut_hb)
         .expect("error registering command templates");
+    handlers::proxy::register_templates(&mut mut_hb).expect("error registering proxy templates");
 
     Arc::new(mut_hb)
 }
@@ -44,14 +45,22 @@ fn main() {
     // easily with others...
     let hb = create_handlebars();
 
-    let routes =
-        handlers::index::create_routes(Arc::clone(&hb), config.main_page_info(), config.commands())
-            .or(handlers::command::create_routes(
-                Arc::clone(&hb),
-                config.commands(),
-            ))
-            .or(handlers::static_file::create_routes())
-            .with(warp::log("main"));
+    let routes = handlers::index::create_routes(
+        Arc::clone(&hb),
+        config.main_page_info(),
+        config.commands(),
+        config.proxies(),
+    )
+    .or(handlers::command::create_routes(
+        Arc::clone(&hb),
+        config.commands(),
+    ))
+    .or(handlers::proxy::create_routes(
+        Arc::clone(&hb),
+        config.proxies(),
+    ))
+    .or(handlers::static_file::create_routes())
+    .with(warp::log("main"));
 
     let listen_addr: std::net::SocketAddr = config
         .server_info()

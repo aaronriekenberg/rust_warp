@@ -14,6 +14,7 @@ static INDEX_TEMPLATE_PATH: &'static str = "./templates/index.hbs";
 struct TemplateData {
     main_page_info: crate::config::MainPageInfo,
     commands: Vec<crate::config::CommandInfo>,
+    proxies: Vec<crate::config::ProxyInfo>,
 }
 
 pub fn register_templates(mut_hb: &mut Handlebars) -> Result<(), handlebars::TemplateFileError> {
@@ -29,10 +30,12 @@ pub fn create_routes(
     hb: Arc<Handlebars>,
     main_page_info: &crate::config::MainPageInfo,
     commands: &Vec<crate::config::CommandInfo>,
+    proxies: &Vec<crate::config::ProxyInfo>,
 ) -> BoxedFilter<(impl Reply,)> {
     let template_data = TemplateData {
         main_page_info: main_page_info.clone(),
         commands: commands.clone(),
+        proxies: proxies.clone(),
     };
 
     let html = build_html_response(hb, template_data);

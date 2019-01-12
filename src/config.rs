@@ -30,21 +30,16 @@ impl CommandInfo {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ProxyInfo {
-    api_path: String,
-    html_path: String,
+    id: String,
     description: String,
     url: String,
 }
 
 impl ProxyInfo {
-    pub fn api_path(&self) -> &String {
-        &self.api_path
-    }
-
-    pub fn html_path(&self) -> &String {
-        &self.html_path
+    pub fn id(&self) -> &String {
+        &self.id
     }
 
     pub fn description(&self) -> &String {
@@ -53,37 +48,6 @@ impl ProxyInfo {
 
     pub fn url(&self) -> &String {
         &self.url
-    }
-}
-
-#[derive(Debug, Clone, Deserialize)]
-pub struct StaticPathInfo {
-    http_path: String,
-    fs_path: String,
-    content_type: String,
-    cache_control: String,
-    include_in_main_page: bool,
-}
-
-impl StaticPathInfo {
-    pub fn http_path(&self) -> &String {
-        &self.http_path
-    }
-
-    pub fn fs_path(&self) -> &String {
-        &self.fs_path
-    }
-
-    pub fn content_type(&self) -> &String {
-        &self.content_type
-    }
-
-    pub fn cache_control(&self) -> &String {
-        &self.cache_control
-    }
-
-    pub fn include_in_main_page(&self) -> bool {
-        self.include_in_main_page
     }
 }
 
