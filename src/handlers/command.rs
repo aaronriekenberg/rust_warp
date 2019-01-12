@@ -51,7 +51,7 @@ fn build_command_map(commands: &Vec<crate::config::CommandInfo>) -> CommandMap {
 }
 
 fn run_command(
-    command_info: crate::config::CommandInfo,
+    command_info: &crate::config::CommandInfo,
 ) -> Box<Future<Item = String, Error = std::io::Error> + Send> {
     let mut command = Command::new(command_info.command());
 
@@ -89,7 +89,7 @@ fn build_command_api_response(
             let args_clone = command_info.args().clone();
 
             Box::new(
-                run_command(command_info.clone())
+                run_command(&command_info)
                     .and_then(move |command_output| {
                         let api_response = APIResponse {
                             now: crate::utils::local_time_now_to_string(),
