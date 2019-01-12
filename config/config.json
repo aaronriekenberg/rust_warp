@@ -30,35 +30,5 @@
       "description": "mpr",
       "url": "http://www.mpr.org"
     }
-  ],
-  "static_paths": [
-    {
-      "http_path": "/command.js",
-      "fs_path": "static/command.js",
-      "content_type": "application/javascript",
-      "cache_control": "max-age=60",
-      "include_in_main_page": false
-    },
-    {
-      "http_path": "/proxy.js",
-      "fs_path": "static/proxy.js",
-      "content_type": "application/javascript",
-      "cache_control": "max-age=60",
-      "include_in_main_page": false
-    },
-    {
-      "http_path": "/favicon.ico",
-      "fs_path": "static/rust-favicon.ico",
-      "content_type": "image/x-icon",
-      "cache_control": "max-age=60",
-      "include_in_main_page": false
-    },
-    {
-      "http_path": "/style.css",
-      "fs_path": "static/style.css",
-      "content_type": "text/css",
-      "cache_control": "max-age=60",
-      "include_in_main_page": false
-    }
   ]
 }
