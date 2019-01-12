@@ -37,14 +37,6 @@ fn create_handlebars() -> Arc<Handlebars> {
     Arc::new(mut_hb)
 }
 
-fn static_file_routes() -> BoxedFilter<(impl Reply,)> {
-    let static_route = warp::path("static").and(warp::fs::dir("./static"));
-
-    let favicon_route = warp::path("favicon.ico").and(warp::fs::file("./static/favicon.ico"));
-
-    static_route.or(favicon_route).boxed()
-}
-
 fn main() {
     install_panic_hook();
 
@@ -66,7 +58,7 @@ fn main() {
                 Arc::clone(&hb),
                 config.commands(),
             ))
-            .or(static_file_routes())
+            .or(handlers::static_file::create_routes())
             .with(warp::log("main"));
 
     let listen_addr: std::net::SocketAddr = config
