@@ -1,9 +1,24 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>{{id}}</title>
-  </head>
-  <body>
-    <h1>Execute {{id}}</h1>
-  </body>
+
+<head>
+  <title>{{description}}</title>
+  <meta name="viewport" content="width=device, initial-scale=1" />
+  <link rel="stylesheet" type="text/css" href="/style.css" />
+  <script src="/command.js"></script>
+</head>
+
+<body onload="onload('{{command}}{{#each args}} {{.}}{{/each}}', '/api/commands/{{id}}')">
+
+<div>
+  <a href="..">..</a>
+  &nbsp;
+  <input type="checkbox" id="autoRefresh" checked>
+  <label for="autoRefresh">Auto Refresh</label>
+</div>
+
+<pre></pre>
+
+</body>
+
 </html>

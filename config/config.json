@@ -10,7 +10,7 @@
       "id": "ifconfig",
       "description": "ifconfig",
       "command": "ifconfig",
-      "args": []
+      "args": ["-a"]
     }
   ],
   "proxies": [

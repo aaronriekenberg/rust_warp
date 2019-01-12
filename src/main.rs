@@ -63,11 +63,20 @@ fn index_route(hb: Arc<Handlebars>) -> BoxedFilter<(impl Reply,)> {
         .boxed()
 }
 
-fn favicon_route() -> BoxedFilter<(impl Reply,)> {
-    warp::get2()
+fn static_file_routes() -> BoxedFilter<(impl Reply,)> {
+    let favicon = warp::get2()
         .and(warp::path("favicon.ico"))
-        .and(warp::fs::file("./static/rust-favicon.ico"))
-        .boxed()
+        .and(warp::fs::file("./static/rust-favicon.ico"));
+
+    let command_js = warp::get2()
+        .and(warp::path("command.js"))
+        .and(warp::fs::file("./static/command.js"));
+
+    let style_css = warp::get2()
+        .and(warp::path("style.css"))
+        .and(warp::fs::file("./static/style.css"));
+
+    favicon.or(command_js).or(style_css).boxed()
 }
 
 fn main() {
@@ -90,7 +99,7 @@ fn main() {
             Arc::clone(&hb),
             config.commands(),
         ))
-        .or(favicon_route())
+        .or(static_file_routes())
         .with(warp::log("main"));
 
     let listen_addr: std::net::SocketAddr = config
