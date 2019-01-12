@@ -1,6 +1,7 @@
 mod config;
 mod handlers;
 mod logging;
+mod utils;
 
 use handlebars::Handlebars;
 
@@ -62,19 +63,6 @@ fn index_route(hb: Arc<Handlebars>) -> BoxedFilter<(impl Reply,)> {
         .boxed()
 }
 
-fn api_route() -> BoxedFilter<(impl Reply,)> {
-    warp::get2()
-        .and(path!("api" / String))
-        .and_then(|user| {
-            if user == "aaron" {
-                Box::new(futures::future::err(warp::reject::not_found()))
-            } else {
-                Box::new(futures::future::ok(format!("hello {}", user)))
-            }
-        })
-        .boxed()
-}
-
 fn favicon_route() -> BoxedFilter<(impl Reply,)> {
     warp::get2()
         .and(warp::path("favicon.ico"))
@@ -102,7 +90,7 @@ fn main() {
             Arc::clone(&hb),
             config.commands(),
         ))
-        .or(api_route())
+        .or(handlers::command::api_route(config.commands()))
         .or(favicon_route())
         .with(warp::log("main"));
 
