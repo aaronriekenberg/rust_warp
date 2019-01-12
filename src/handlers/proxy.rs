@@ -52,15 +52,28 @@ type HyperHttpClient = ::hyper::Client<
     ::hyper::Body,
 >;
 
-type ProxyMap = HashMap<String, crate::config::ProxyInfo>;
+#[derive(Clone)]
+struct ProxyInfoAndURI {
+    proxy_info: crate::config::ProxyInfo,
+    uri: Uri,
+}
+
+type ProxyMap = HashMap<String, ProxyInfoAndURI>;
 
 fn build_proxy_map(proxies: &Vec<crate::config::ProxyInfo>) -> ProxyMap {
     let mut map = ProxyMap::new();
     for proxy_info in proxies {
-        map.insert(proxy_info.id().clone(), proxy_info.clone());
+        map.insert(
+            proxy_info.id().clone(),
+            ProxyInfoAndURI {
+                proxy_info: proxy_info.clone(),
+                uri: proxy_info.url().parse().expect("error parsing proxy url"),
+            },
+        );
     }
     map
 }
+
 #[derive(Default)]
 struct ResponseInfo {
     version: String,
@@ -120,20 +133,20 @@ struct APIResponse {
 
 fn build_proxy_api_response(
     http_client: &HyperHttpClient,
-    proxy_info_option: Option<&crate::config::ProxyInfo>,
+    proxy_info_and_uri_option: Option<&ProxyInfoAndURI>,
 ) -> Box<Future<Item = impl warp::Reply, Error = warp::Rejection> + Send> {
-    match proxy_info_option {
+    match proxy_info_and_uri_option {
         None => Box::new(futures::future::err(warp::reject::not_found())),
-        Some(proxy_info) => {
-            let uri = proxy_info.url().parse().unwrap();
+        Some(proxy_info_and_uri) => {
+            let uri_clone = proxy_info_and_uri.uri.clone();
 
             Box::new(
-                fetch_proxy(&uri, &http_client)
+                fetch_proxy(&proxy_info_and_uri.uri, &http_client)
                     .and_then(move |response_info| {
                         let api_response = APIResponse {
                             now: crate::utils::local_time_now_to_string(),
                             method: "GET".to_string(),
-                            url: uri.to_string(),
+                            url: uri_clone.to_string(),
                             version: response_info.version,
                             status: response_info.status,
                             headers: response_info.headers,
