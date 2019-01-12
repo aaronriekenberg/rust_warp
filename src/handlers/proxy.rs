@@ -132,8 +132,6 @@ fn build_proxy_api_response(
     match proxy_info_option {
         None => Box::new(futures::future::err(warp::reject::not_found())),
         Some(proxy_info) => {
-            // let command_clone = proxy_info.command().clone();
-            // let args_clone = proxy_info.args().clone();
             let uri = proxy_info.url().parse().unwrap();
 
             Box::new(

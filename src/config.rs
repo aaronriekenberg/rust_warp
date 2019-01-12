@@ -17,10 +17,6 @@ impl CommandInfo {
         &self.id
     }
 
-    pub fn description(&self) -> &String {
-        &self.description
-    }
-
     pub fn command(&self) -> &String {
         &self.command
     }
@@ -42,10 +38,6 @@ impl ProxyInfo {
         &self.id
     }
 
-    pub fn description(&self) -> &String {
-        &self.description
-    }
-
     pub fn url(&self) -> &String {
         &self.url
     }
@@ -65,12 +57,6 @@ impl ServerInfo {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MainPageInfo {
     title: String,
-}
-
-impl MainPageInfo {
-    pub fn title(&self) -> &String {
-        &self.title
-    }
 }
 
 #[derive(Debug, Clone, Deserialize)]
