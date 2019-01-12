@@ -38,7 +38,11 @@ fn create_handlebars() -> Arc<Handlebars> {
 }
 
 fn static_file_routes() -> BoxedFilter<(impl Reply,)> {
-    warp::path("static").and(warp::fs::dir("./static")).boxed()
+    let static_route = warp::path("static").and(warp::fs::dir("./static"));
+
+    let favicon_route = warp::path("favicon.ico").and(warp::fs::file("./static/favicon.ico"));
+
+    static_route.or(favicon_route).boxed()
 }
 
 fn main() {

@@ -3,12 +3,9 @@ use handlebars::Handlebars;
 use serde_derive::Serialize;
 
 use std::error::Error;
-use std::process::Command;
 use std::sync::Arc;
 
-use tokio_process::CommandExt;
-
-use warp::{filters::BoxedFilter, path, Filter, Future, Reply};
+use warp::{filters::BoxedFilter, Filter, Future, Reply};
 
 #[derive(Serialize)]
 struct TemplateData {
