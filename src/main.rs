@@ -24,6 +24,7 @@ fn install_panic_hook() {
 
 fn create_handlebars() -> Arc<Handlebars> {
     let mut mut_hb = Handlebars::new();
+    mut_hb.set_strict_mode(true);
 
     mut_hb
         .register_template_file("index.html", "./templates/index.hbs")
@@ -55,13 +56,14 @@ fn main() {
     // easily with others...
     let hb = create_handlebars();
 
-    let routes = handlers::index::create_routes(Arc::clone(&hb), config.main_page_info())
-        .or(handlers::command::create_routes(
-            Arc::clone(&hb),
-            config.commands(),
-        ))
-        .or(static_file_routes())
-        .with(warp::log("main"));
+    let routes =
+        handlers::index::create_routes(Arc::clone(&hb), config.main_page_info(), config.commands())
+            .or(handlers::command::create_routes(
+                Arc::clone(&hb),
+                config.commands(),
+            ))
+            .or(static_file_routes())
+            .with(warp::log("main"));
 
     let listen_addr: std::net::SocketAddr = config
         .server_info()
