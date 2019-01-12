@@ -5,7 +5,10 @@ use serde_derive::Serialize;
 use std::error::Error;
 use std::sync::Arc;
 
-use warp::{filters::BoxedFilter, Filter, Future, Reply};
+use warp::{filters::BoxedFilter, Filter, Reply};
+
+static INDEX_TEMPLATE_NAME: &'static str = "index.html";
+static INDEX_TEMPLATE_PATH: &'static str = "./templates/index.hbs";
 
 #[derive(Serialize)]
 struct TemplateData {
@@ -13,8 +16,12 @@ struct TemplateData {
     commands: Vec<crate::config::CommandInfo>,
 }
 
+pub fn register_templates(mut_hb: &mut Handlebars) -> Result<(), handlebars::TemplateFileError> {
+    mut_hb.register_template_file(INDEX_TEMPLATE_NAME, INDEX_TEMPLATE_PATH)
+}
+
 fn build_html_response(hb: Arc<Handlebars>, template_data: TemplateData) -> String {
-    hb.render("index.html", &template_data)
+    hb.render(INDEX_TEMPLATE_NAME, &template_data)
         .unwrap_or_else(|err| err.description().to_owned())
 }
 

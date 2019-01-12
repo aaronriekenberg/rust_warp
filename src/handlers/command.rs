@@ -11,6 +11,13 @@ use tokio_process::CommandExt;
 
 use warp::{filters::BoxedFilter, path, Filter, Future, Reply};
 
+static COMMAND_TEMPLATE_NAME: &'static str = "command.html";
+static COMMAND_TEMPLATE_PATH: &'static str = "./templates/command.hbs";
+
+pub fn register_templates(mut_hb: &mut Handlebars) -> Result<(), handlebars::TemplateFileError> {
+    mut_hb.register_template_file(COMMAND_TEMPLATE_NAME, COMMAND_TEMPLATE_PATH)
+}
+
 type HTMLMap = HashMap<String, String>;
 
 fn build_html_map(hb: Arc<Handlebars>, commands: &Vec<crate::config::CommandInfo>) -> HTMLMap {

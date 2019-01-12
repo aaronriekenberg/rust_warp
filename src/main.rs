@@ -5,13 +5,9 @@ mod utils;
 
 use handlebars::Handlebars;
 
-use serde::Serialize;
-use serde_json::json;
-
-use std::error::Error;
 use std::sync::Arc;
 
-use warp::{filters::BoxedFilter, Filter, Reply};
+use warp::Filter;
 
 fn install_panic_hook() {
     let original_panic_hook = std::panic::take_hook();
@@ -26,13 +22,9 @@ fn create_handlebars() -> Arc<Handlebars> {
     let mut mut_hb = Handlebars::new();
     mut_hb.set_strict_mode(true);
 
-    mut_hb
-        .register_template_file("index.html", "./templates/index.hbs")
-        .expect("failed to register index.html");
-
-    mut_hb
-        .register_template_file("command.html", "./templates/command.hbs")
-        .expect("failed to register command.html");
+    handlers::index::register_templates(&mut mut_hb).expect("error registering index templates");
+    handlers::command::register_templates(&mut mut_hb)
+        .expect("error registering command templates");
 
     Arc::new(mut_hb)
 }

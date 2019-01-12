@@ -1,4 +1,4 @@
-use warp::{filters::BoxedFilter, Filter, Future, Reply};
+use warp::{filters::BoxedFilter, Filter, Reply};
 
 pub fn create_routes() -> BoxedFilter<(impl Reply,)> {
     let static_route = warp::path("static").and(warp::fs::dir("./static"));
