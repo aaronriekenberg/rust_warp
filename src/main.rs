@@ -49,6 +49,7 @@ fn main() {
         config.commands(),
         config.proxies(),
     )
+    .or(handlers::config::create_routes(&config))
     .or(handlers::command::create_routes(
         Arc::clone(&hb),
         config.commands(),
