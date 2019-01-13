@@ -13,19 +13,21 @@
 
   {{#if commands}}
     <h3>Commands:</h3>
-      <ul>{{#each commands}}
-        <li><a href="/commands/{{id}}">{{description}}</a></li>{{/each}}
-      </ul>
-    </h3>
+    <ul>{{#each commands}}
+      <li><a href="/commands/{{id}}">{{description}}</a></li>{{/each}}
+    </ul>
   {{/if}}
 
   {{#if proxies}}
     <h3>Proxies:</h3>
-      <ul>{{#each proxies}}
-        <li><a href="/proxies/{{id}}">{{description}}</a></li>{{/each}}
-      </ul>
-    </h3>
+    <ul>{{#each proxies}}
+      <li><a href="/proxies/{{id}}">{{description}}</a></li>{{/each}}
+    </ul>
   {{/if}}
+
+  <hr>
+  
+  <small>Page Generated: {{last_modified}}</small>
 
 </body>
 

@@ -15,6 +15,7 @@ struct TemplateData {
     main_page_info: crate::config::MainPageInfo,
     commands: Vec<crate::config::CommandInfo>,
     proxies: Vec<crate::config::ProxyInfo>,
+    last_modified: String,
 }
 
 pub fn register_templates(mut_hb: &mut Handlebars) -> Result<(), handlebars::TemplateFileError> {
@@ -36,6 +37,7 @@ pub fn create_routes(
         main_page_info: main_page_info.clone(),
         commands: commands.clone(),
         proxies: proxies.clone(),
+        last_modified: crate::utils::local_time_now_to_string(),
     };
 
     let html = build_html_response(hb, template_data);
