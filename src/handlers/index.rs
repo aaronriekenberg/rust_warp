@@ -15,6 +15,7 @@ struct TemplateData {
     main_page_info: crate::config::MainPageInfo,
     commands: Vec<crate::config::CommandInfo>,
     proxies: Vec<crate::config::ProxyInfo>,
+    environment: crate::environment::Environment,
     last_modified: String,
 }
 
@@ -32,11 +33,13 @@ pub fn create_routes(
     main_page_info: &crate::config::MainPageInfo,
     commands: &Vec<crate::config::CommandInfo>,
     proxies: &Vec<crate::config::ProxyInfo>,
+    environment: &crate::environment::Environment,
 ) -> BoxedFilter<(impl Reply,)> {
     let template_data = TemplateData {
         main_page_info: main_page_info.clone(),
         commands: commands.clone(),
         proxies: proxies.clone(),
+        environment: environment.clone(),
         last_modified: crate::utils::local_time_now_to_string(),
     };
 

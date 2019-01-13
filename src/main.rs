@@ -1,4 +1,5 @@
 mod config;
+mod environment;
 mod handlers;
 mod logging;
 mod utils;
@@ -41,6 +42,8 @@ fn main() {
 
     let config = config::read_config(config_file).expect("error reading configuration file");
 
+    let environment = environment::get_environment().expect("error getting environment");
+
     let hb = create_handlebars();
 
     let routes = handlers::index::create_routes(
@@ -48,12 +51,14 @@ fn main() {
         config.main_page_info(),
         config.commands(),
         config.proxies(),
+        &environment,
     )
     .or(handlers::config::create_routes(&config))
     .or(handlers::command::create_routes(
         Arc::clone(&hb),
         config.commands(),
     ))
+    .or(handlers::environment::create_routes(&environment))
     .or(handlers::proxy::create_routes(
         Arc::clone(&hb),
         config.proxies(),
