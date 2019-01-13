@@ -46,11 +46,21 @@ impl ProxyInfo {
 #[derive(Debug, Clone, Deserialize)]
 pub struct ServerInfo {
     listen_address: String,
+    cert_file: String,
+    key_file: String,
 }
 
 impl ServerInfo {
     pub fn listen_address(&self) -> &String {
         &self.listen_address
+    }
+
+    pub fn cert_file(&self) -> &String {
+        &self.cert_file
+    }
+
+    pub fn key_file(&self) -> &String {
+        &self.key_file
     }
 }
 

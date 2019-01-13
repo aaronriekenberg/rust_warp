@@ -1,6 +1,8 @@
 {
   "server_info": {
-    "listen_address": "0.0.0.0:8000"
+    "listen_address": "0.0.0.0:8000",
+    "cert_file": "localhost-cert.pem",
+    "key_file": "localhost-privkey.pem"
   },
   "main_page_info": {
     "title": "Rusty Web"

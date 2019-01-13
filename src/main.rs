@@ -67,6 +67,9 @@ fn main() {
         .expect("listen_addr parse error");
 
     warp::serve(routes)
-        .tls("localhost-cert.pem", "localhost-privkey.pem")
+        .tls(
+            config.server_info().cert_file(),
+            config.server_info().key_file(),
+        )
         .run(listen_addr);
 }
