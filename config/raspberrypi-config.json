@@ -1,0 +1,168 @@
+{
+  "server_info": {
+    "listen_address": "0.0.0.0:8000",
+    "cert_file": "cert.pem",
+    "key_file": "key.pem"
+  },
+  "main_page_info": {
+    "title": "Aaron's Raspberry Pi"
+  },
+  "commands": [
+    {
+      "id": "arp",
+      "description": "arp",
+      "command": "/usr/sbin/arp",
+      "args": [
+        "-an"
+      ]
+    },
+    {
+      "id": "cpu_vulnerabilities",
+      "description": "cpu vulnerabilities",
+      "command": "/bin/sh",
+      "args": [
+        "-c",
+        "grep . /sys/devices/system/cpu/vulnerabilities/*"
+      ]
+    },
+    {
+      "id": "df",
+      "description": "df",
+      "command": "df",
+      "args": [
+        "-h"
+      ]
+    },
+    {
+      "id": "dmesg",
+      "description": "dmesg",
+      "command": "sudo",
+      "args": [
+        "dmesg"
+      ]
+    },
+    {
+      "id": "ifconfig",
+      "description": "ifconfig",
+      "command": "/sbin/ifconfig",
+      "args": []
+    },
+    {
+      "id": "iwconfig",
+      "description": "iwconfig",
+      "command": "/sbin/iwconfig",
+      "args": []
+    },
+    {
+      "id": "log_ls",
+      "description": "log ls",
+      "command": "ls",
+      "args": [
+        "-latrh",
+        "/home/pi/rust_hyper/logs"
+      ]
+    },
+    {
+      "id": "log_tail",
+      "description": "log tail",
+      "command": "tail",
+      "args": [
+        "-n30",
+        "/home/pi/rust_hyper/logs/current"
+      ]
+    },
+    {
+      "id": "lscpu",
+      "description": "lscpu",
+      "command": "lscpu",
+      "args": []
+    },
+    {
+      "id": "ncal",
+      "description": "ncal",
+      "command": "ncal",
+      "args": [
+        "-h",
+        "-y"
+      ]
+    },
+    {
+      "id": "netstat_an",
+      "description": "netstat -an",
+      "command": "netstat",
+      "args": [
+        "-an"
+      ]
+    },
+    {
+      "id": "netstat_s",
+      "description": "netstat -s",
+      "command": "netstat",
+      "args": [
+        "-s"
+      ]
+    },
+    {
+      "id": "ntpq",
+      "description": "ntpq",
+      "command": "ntpq",
+      "args": [
+        "-p"
+      ]
+    },
+    {
+      "id": "pitemp",
+      "description": "pitemp",
+      "command": "/home/pi/bin/pitemp.sh",
+      "args": []
+    },
+    {
+      "id": "tc_qdisc",
+      "description": "tc qdisc show",
+      "command": "/sbin/tc",
+      "args": [
+        "-s",
+        "qdisc",
+        "show"
+      ]
+    },
+    {
+      "id": "top",
+      "description": "top",
+      "command": "top",
+      "args": [
+        "-b",
+        "-n1"
+      ]
+    },
+    {
+      "id": "unifi_logs",
+      "description": "unifi logs",
+      "command": "sudo",
+      "args": [
+        "tail",
+        "-n30",
+        "/var/log/unifi/server.log"
+      ]
+    },
+    {
+      "id": "uptime",
+      "description": "uptime",
+      "command": "uptime",
+      "args": []
+    },
+    {
+      "id": "vmstat",
+      "description": "vmstat",
+      "command": "vmstat",
+      "args": []
+    },
+    {
+      "id": "w",
+      "description": "w",
+      "command": "w",
+      "args": []
+    }
+  ],
+  "proxies": []
+}
