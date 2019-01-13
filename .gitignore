@@ -2,3 +2,5 @@
 **/*.rs.bk
 **/*.swp
 *.pem
+logs/current
+logs/lock
