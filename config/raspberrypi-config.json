@@ -59,7 +59,7 @@
       "command": "ls",
       "args": [
         "-latrh",
-        "/home/pi/rust_hyper/logs"
+        "/home/pi/rust_warp/logs"
       ]
     },
     {
@@ -68,7 +68,7 @@
       "command": "tail",
       "args": [
         "-n30",
-        "/home/pi/rust_hyper/logs/current"
+        "/home/pi/rust_warp/logs/current"
       ]
     },
     {
