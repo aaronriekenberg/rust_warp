@@ -1,8 +1,8 @@
 {
   "server_info": {
     "listen_address": "0.0.0.0:8000",
-    "cert_file": "cert.pem",
-    "key_file": "key.pem"
+    "cert_file": "raspberrypi-cert.pem",
+    "key_file": "raspberrypi-privkey.pem"
   },
   "main_page_info": {
     "title": "Aaron's Raspberry Pi"
