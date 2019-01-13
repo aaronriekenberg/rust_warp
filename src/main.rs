@@ -41,8 +41,6 @@ fn main() {
 
     let config = config::read_config(config_file).expect("error reading configuration file");
 
-    // Turn Handlebars instance into a Filter so we can combine it
-    // easily with others...
     let hb = create_handlebars();
 
     let routes = handlers::index::create_routes(
