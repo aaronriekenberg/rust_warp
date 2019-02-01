@@ -1,6 +1,7 @@
 use chrono::prelude::Local;
 
 use std::io::Write;
+use std::str::FromStr;
 use std::sync::mpsc;
 
 fn run_logging_output_thread(receiver: mpsc::Receiver<String>) {
@@ -53,8 +54,11 @@ pub fn initialize_logging() -> Result<(), Box<::std::error::Error>> {
             run_logging_output_thread(receiver);
         })?;
 
+    let log_level_string = std::env::var("LOGGING_LEVEL").unwrap_or("INFO".to_string());
+    let log_level = ::log::LevelFilter::from_str(&log_level_string)?;
+
     ::fern::Dispatch::new()
-        .level(::log::LevelFilter::Info)
+        .level(log_level)
         .format(|out, message, record| {
             out.finish(format_args!(
                 "{} [{}] {} {} - {}",
