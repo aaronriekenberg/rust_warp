@@ -42,7 +42,7 @@ fn html_route(
         .and(path!("commands" / String))
         .and_then(move |command_id| match html_map.get(&command_id) {
             None => Err(warp::reject::not_found()),
-            Some(html) => Ok(html.clone()),
+            Some(html) => Ok(crate::utils::html_string_to_response(html.clone())),
         })
         .boxed()
 }
