@@ -42,7 +42,7 @@ fn html_route(
         .and(path!("proxies" / String))
         .and_then(move |proxy_id| match html_map.get(&proxy_id) {
             None => Err(warp::reject::not_found()),
-            Some(html) => Ok(crate::utils::html_string_to_response(html.clone())),
+            Some(html) => Ok(warp::reply::html(html.clone())),
         })
         .boxed()
 }

@@ -47,6 +47,6 @@ pub fn create_routes(
 
     warp::get2()
         .and(warp::path::end())
-        .map(move || crate::utils::html_string_to_response(html.clone()))
+        .map(move || warp::reply::html(html.clone()))
         .boxed()
 }
