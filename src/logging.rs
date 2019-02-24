@@ -45,6 +45,12 @@ fn run_logging_output_thread(receiver: mpsc::Receiver<String>) {
     }
 }
 
+fn get_log_level() -> Result<::log::LevelFilter, Box<::std::error::Error>> {
+    let log_level_string = ::std::env::var("LOGGING_LEVEL").unwrap_or("INFO".to_string());
+    let log_level = ::log::LevelFilter::from_str(&log_level_string)?;
+    Ok(log_level)
+}
+
 pub fn initialize_logging() -> Result<(), Box<::std::error::Error>> {
     let (sender, receiver) = mpsc::channel();
 
@@ -54,8 +60,7 @@ pub fn initialize_logging() -> Result<(), Box<::std::error::Error>> {
             run_logging_output_thread(receiver);
         })?;
 
-    let log_level_string = ::std::env::var("LOGGING_LEVEL").unwrap_or("INFO".to_string());
-    let log_level = ::log::LevelFilter::from_str(&log_level_string)?;
+    let log_level = get_log_level()?;
 
     ::fern::Dispatch::new()
         .level(log_level)
